@@ -7,7 +7,6 @@ def main():
     print("\nEduCLI | A CLI application for student database management")
     active = True
     database = []
-
     with open("student.csv", "r") as csv_file:
         reader = csv.DictReader(csv_file)
         for line in reader:
