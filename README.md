@@ -16,10 +16,6 @@ Use [python](https://www.python.org/) to run the application
 ```
 $ python project.py
 ```
-Use [pytest](https://docs.pytest.org/en/7.4.x/) to test the application
-```
-$ pytest test_project.py
-```
 
 ---
 
