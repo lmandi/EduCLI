@@ -19,11 +19,11 @@ def main():
             case "V":
                 view_student(database)
             case "A":
-                create_student(database)
+                database = create_student(database)
             case "U":
-                update_student(database)
+                database = update_student(database)
             case "D":
-                delete_student(database)
+                database = delete_student(database)
             case _:
                 print("Goodbye!")
                 active = False
@@ -67,11 +67,53 @@ def create_student(data):
         for line in reader:
             data.append({"ID": line["id"], "First": line["first"], "Last": line["last"], "House": line["house"]})
     view_student(data)
+    return data
 
 
 def update_student(data):
-    stud_id = verify_id(data)
-    update_csv(stud_id)
+    numbers = list(student["ID"] for student in data)
+    while True:
+        try:
+            stud_id = input("Which student's data would you like to update?: ")
+            if stud_id in numbers:
+                break
+            else:
+                print("Invalid student ID, please try again.")
+
+        except ValueError:
+            print("Invalid input, try again.")
+    first = input("Student's updated first name: ")
+    last = input("Student's updated last name: ")
+    house = input("Student's updated house: ")
+
+    with open("student.csv", "r") as before:
+        with open("temp.csv", "w", newline="") as temp:
+            fieldnames = ["id", "first", "last", "house"]
+            reader = csv.DictReader(before, fieldnames=fieldnames)
+            writer = csv.DictWriter(temp, fieldnames=fieldnames)
+            for row in reader:
+                if stud_id == row["id"]:
+                    print("Updating student", row["id"])
+                    if first == "":
+                        first = row["first"]
+                    if last == "":
+                        last = row["last"]
+                    if house == "":
+                        house = row["house"]
+                    row["first"], row["last"], row["house"] = first, last, house
+                    row = {"id": stud_id, "first": row["first"], "last": row["last"], "house": row["house"]}
+                    writer.writerow(row)
+                else:
+                    writer.writerow(row)
+
+    with open("temp.csv", "r") as after:
+        with open("student.csv", "w", newline="") as final:
+            fieldnames = ["id", "first", "last", "house"]
+            reader = csv.DictReader(after, fieldnames=fieldnames)
+            writer = csv.DictWriter(final, fieldnames=fieldnames)
+            for row in reader:
+                writer.writerow(row)
+    os.remove("temp.csv")
 
     data = []
     with open("student.csv", "r") as csv_file:
@@ -79,6 +121,7 @@ def update_student(data):
         for line in reader:
             data.append({"ID": line["id"], "First": line["first"], "Last": line["last"], "House": line["house"]})
     view_student(data)
+    return data
 
 
 def delete_student(data):
@@ -127,56 +170,7 @@ def delete_student(data):
         for line in reader:
             data.append({"ID": line["id"], "First": line["first"], "Last": line["last"], "House": line["house"]})
     view_student(data)
-
-
-def verify_id(data):
-    numbers = list(student["ID"] for student in data)
-    while True:
-        try:
-            stud_id = input("Which student's data would you like to update?: ")
-            if stud_id in numbers:
-                break
-            else:
-                print("Invalid student ID, please try again.")
-
-        except ValueError:
-            print("Invalid input, try again.")
-    return stud_id
-
-
-def update_csv(stud_id):
-    first = input("Student's updated first name: ")
-    last = input("Student's updated last name: ")
-    house = input("Student's updated house: ")
-
-    with open("student.csv", "r") as before:
-        with open("temp.csv", "w", newline="") as temp:
-            fieldnames = ["id", "first", "last", "house"]
-            reader = csv.DictReader(before, fieldnames=fieldnames)
-            writer = csv.DictWriter(temp, fieldnames=fieldnames)
-            for row in reader:
-                if stud_id == row["id"]:
-                    print("Updating student", row["id"])
-                    if first == "":
-                        first = row["first"]
-                    if last == "":
-                        last = row["last"]
-                    if house == "":
-                        house = row["house"]
-                    row["first"], row["last"], row["house"] = first, last, house
-                    row = {"id": stud_id, "first": row["first"], "last": row["last"], "house": row["house"]}
-                    writer.writerow(row)
-                else:
-                    writer.writerow(row)
-
-    with open("temp.csv", "r") as after:
-        with open("student.csv", "w", newline="") as final:
-            fieldnames = ["id", "first", "last", "house"]
-            reader = csv.DictReader(after, fieldnames=fieldnames)
-            writer = csv.DictWriter(final, fieldnames=fieldnames)
-            for row in reader:
-                writer.writerow(row)
-    os.remove("temp.csv")
+    return data
 
 
 if __name__ == "__main__":
