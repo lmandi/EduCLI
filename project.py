@@ -19,11 +19,40 @@ def main():
             case "V":
                 view_student(database)
             case "A":
-                database = create_student(database)
+                first = input("First Name: ")
+                last = input("Last Name: ")
+                house = input("House: ")
+                database = create_student(database, first, last, house)
             case "U":
-                database = update_student(database)
+                numbers = list(student["ID"] for student in database)
+                while True:
+                    try:
+                        stud_id = input("Which student's data would you like to update?: ")
+                        if stud_id in numbers:
+                            break
+                        else:
+                            print("Invalid student ID, please try again.")
+
+                    except ValueError:
+                        print("Invalid input, try again.")
+
+                first = input("Student's updated first name: ")
+                last = input("Student's updated last name: ")
+                house = input("Student's updated house: ")
+                database = update_student(stud_id, first, last, house)
             case "D":
-                database = delete_student(database)
+                numbers = list(student["ID"] for student in database)
+                while True:
+                    try:
+                        stud_id = input("Which student's data would you like to delete?: ")
+                        if stud_id in numbers:
+                            break
+                        else:
+                            print("Invalid student ID, please try again.")
+
+                    except ValueError:
+                        print("Invalid input, try again.")
+                database = delete_student(database, stud_id)
             case _:
                 print("Goodbye!")
                 active = False
@@ -50,16 +79,13 @@ def view_student(data):
     print(tabulate(data, headers="keys", tablefmt="rounded_grid"))
 
 
-def create_student(data):
+def create_student(data, first, last, house):
     with open("student.csv", 'a', newline='') as csvfile:
         fieldnames = ["id", "first", "last", "house"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         i = 1
         for _ in data:
             i += 1
-        first = input("First Name: ")
-        last = input("Last Name: ")
-        house = input("House: ")
         writer.writerow({"id": i, "first": first, "last": last, "house": house})
     data = []
     with open("student.csv", "r") as csv_file:
@@ -70,21 +96,7 @@ def create_student(data):
     return data
 
 
-def update_student(data):
-    numbers = list(student["ID"] for student in data)
-    while True:
-        try:
-            stud_id = input("Which student's data would you like to update?: ")
-            if stud_id in numbers:
-                break
-            else:
-                print("Invalid student ID, please try again.")
-
-        except ValueError:
-            print("Invalid input, try again.")
-    first = input("Student's updated first name: ")
-    last = input("Student's updated last name: ")
-    house = input("Student's updated house: ")
+def update_student(stud_id, first, last, house):
 
     with open("student.csv", "r") as before:
         with open("temp.csv", "w", newline="") as temp:
@@ -124,18 +136,7 @@ def update_student(data):
     return data
 
 
-def delete_student(data):
-    numbers = list(student["ID"] for student in data)
-    while True:
-        try:
-            stud_id = input("Which student's data would you like to delete?: ")
-            if stud_id in numbers:
-                break
-            else:
-                print("Invalid student ID, please try again.")
-
-        except ValueError:
-            print("Invalid input, try again.")
+def delete_student(data, stud_id):
 
     with open("student.csv", "r") as before:
         with open("temp.csv", "w", newline="") as temp:
