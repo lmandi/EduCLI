@@ -1,5 +1,6 @@
 # EduCLI
 A command-line interface Python app for managing a student database
+
 [Video demo](https://youtu.be/A8raDnVtq_4)
 
 ---
